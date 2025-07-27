@@ -1,0 +1,11 @@
+{
+  "name": "@seiagentguard/scripts",
+  "version": "1.0.0",
+  "scripts": {
+    "setup-aws": "node setup-aws.js",
+    "deploy-models": "node deploy-models.js",
+    "generate-keys": "node generate-keys.js"
+  },
+  "dependencies": {
+  }
+}

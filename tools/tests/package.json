@@ -1,0 +1,15 @@
+{
+  "name": "@seiagentguard/tests",
+  "version": "1.0.0",
+  "scripts": {
+    "security": "vitest run security.test.ts",
+    "integration": "vitest run integration.test.ts",
+    "attacks": "vitest run attacks.test.ts",
+    "performance": "vitest run performance.test.ts"
+  },
+  "dependencies": {
+    "@seiagentguard/core": "^1.0.0",
+    "@seiagentguard/sdk": "^1.0.0",
+    "vitest": "^3.2.4"
+  }
+}

@@ -1,0 +1,29 @@
+{
+  "name": "seiagentguard",
+  "version": "1.0.0",
+  "private": true,
+  "workspaces": [
+    "packages/*",
+    "apps/*"
+  ],
+  "scripts": {
+    "dev": "npm run dev --workspaces",
+    "build": "npm run build --workspaces",
+    "test": "npm run test --workspaces",
+    "setup": "npm install && npm run setup:contracts && npm run setup:aws",
+    "setup:contracts": "cd packages/contracts && npm run compile",
+    "setup:aws": "cd tools/scripts && node setup-aws.js",
+    "deploy:testnet": "cd packages/contracts && npm run deploy:testnet",
+    "deploy:mainnet": "cd packages/contracts && npm run deploy:mainnet",
+    "test:security": "cd tools/tests && npm run security",
+    "test:integration": "cd tools/tests && npm run integration",
+    "test:attacks": "cd tools/tests && npm run attacks",
+    "test:performance": "cd tools/tests && npm run performance"
+  },
+  "devDependencies": {
+    "@types/node": "^24.1.0",
+    "typescript": "^5.8.3",
+    "tsx": "^4.20.3",
+    "vitest": "^3.2.4"
+  }
+}
