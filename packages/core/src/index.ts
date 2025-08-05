@@ -67,14 +67,14 @@ async function detectThreats(prompt: string): Promise<number> {
 
   for (const pattern of maliciousPatterns) {
     if (lowerPrompt.includes(pattern)) {
-      riskScore += 0.3;
+      riskScore += 0.4; // Increased from 0.3 to trigger block action
     }
   }
 
   // Additional heuristics
-  if (lowerPrompt.includes('ignore')) riskScore += 0.1;
-  if (lowerPrompt.includes('override')) riskScore += 0.1;
-  if (lowerPrompt.includes('[SYSTEM]')) riskScore += 0.2;
+  if (lowerPrompt.includes('ignore')) riskScore += 0.2; // Increased from 0.1
+  if (lowerPrompt.includes('override')) riskScore += 0.2; // Increased from 0.1
+  if (lowerPrompt.includes('[SYSTEM]')) riskScore += 0.3; // Increased from 0.2
 
   return Math.min(riskScore, 1.0);
 }

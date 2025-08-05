@@ -1,13 +1,8 @@
 {
-  "name": "contracts",
+  "name": "@seiagentguard/contracts",
   "version": "1.0.0",
-  "main": "index.js",
-  "devDependencies": {},
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "description": ""
+    "test": "echo \"No tests specified for contracts package in Phase 1\" && exit 0",
+    "compile": "echo \"Contract compilation will be added in Phase 3\" && exit 0"
+  }
 }

@@ -19,14 +19,14 @@ async function analyzeRequest(request: any): Promise<any> {
 
   for (const pattern of maliciousPatterns) {
     if (lowerPrompt.includes(pattern)) {
-      riskScore += 0.3;
+      riskScore += 0.4;
     }
   }
 
   // Additional heuristics
-  if (lowerPrompt.includes('ignore')) riskScore += 0.1;
-  if (lowerPrompt.includes('override')) riskScore += 0.1;
-  if (lowerPrompt.includes('[SYSTEM]')) riskScore += 0.2;
+  if (lowerPrompt.includes('ignore')) riskScore += 0.2;
+  if (lowerPrompt.includes('override')) riskScore += 0.2;
+  if (lowerPrompt.includes('[SYSTEM]')) riskScore += 0.3;
 
   riskScore = Math.min(riskScore, 1.0);
   const processingTime = Date.now() - startTime;
@@ -34,10 +34,11 @@ async function analyzeRequest(request: any): Promise<any> {
   let action: 'allow' | 'block' | 'modify' | 'warn' = 'allow';
   let reason = 'Request appears safe';
 
-  if (riskScore > 0.8) {
+  // More strict thresholds
+  if (riskScore > 0.3) {
     action = 'block';
     reason = 'High risk content detected';
-  } else if (riskScore > 0.5) {
+  } else if (riskScore > 0.1) {
     action = 'warn';
     reason = 'Moderate risk content detected';
   }
