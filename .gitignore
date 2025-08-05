@@ -46,3 +46,5 @@ typechain-types/
 
 # AWS
 .aws/
+
+PHASE-GUIDE.md
