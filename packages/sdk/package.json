@@ -1,18 +1,8 @@
 {
   "name": "@seiagentguard/sdk",
   "version": "1.0.0",
-  "main": "dist/index.js",
-  "types": "dist/index.d.ts",
   "scripts": {
-    "build": "tsc",
-    "dev": "tsx watch src/index.ts",
-    "test": "vitest"
-  },
-  "dependencies": {
-  },
-  "devDependencies": {
-   "typescript": "^5.8.3",
-    "tsx": "^4.20.3",
-    "vitest": "^3.2.4"
+    "test": "echo \"No tests specified for SDK package in Phase 1\" && exit 0",
+    "build": "echo \"SDK build will be added in Phase 4\" && exit 0"
   }
 }

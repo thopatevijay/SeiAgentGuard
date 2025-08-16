@@ -54,7 +54,7 @@ SeiAgentGuard addresses these challenges through:
 
 ## 📋 Prerequisites
 
-- Node.js 18+
+- Node.js v22.17.1
 - npm or yarn
 - Git
 - VS Code IDE
