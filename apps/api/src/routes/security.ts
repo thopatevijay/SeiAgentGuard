@@ -1,4 +1,9 @@
 import { Router } from 'express';
+import { SecurityCache } from '../cache';
+import { createHash } from 'crypto';
+
+// Initialize Redis cache
+const cache = new SecurityCache();
 
 // Temporary local implementation for Phase 2 (will be replaced with proper core import)
 interface AgentRequest {
@@ -16,11 +21,28 @@ interface SecurityResponse {
   evidence: Record<string, any>;
 }
 
-// Mock threat detection for Phase 2
+// Enhanced threat detection with Redis caching for Phase 2
 async function analyzeRequest(request: AgentRequest): Promise<SecurityResponse> {
   const startTime = Date.now();
   
   try {
+    // Generate cache key
+    const promptHash = createHash('sha256').update(request.prompt).digest('hex').slice(0, 16);
+    const cacheKey = cache.generateKey(request.agentId, promptHash);
+    
+    // Check cache first
+    const cached = await cache.get(cacheKey);
+    if (cached) {
+      return {
+        ...cached,
+        processingTime: Date.now() - startTime,
+        evidence: {
+          ...cached.evidence,
+          cached: true
+        }
+      };
+    }
+    
     // Enhanced threat detection patterns
     const maliciousPatterns = [
       'ignore previous instructions',
@@ -111,7 +133,7 @@ async function analyzeRequest(request: AgentRequest): Promise<SecurityResponse> 
       reason = 'Rate limit exceeded';
     }
     
-    return {
+    const result = {
       action,
       reason,
       riskScore,
@@ -120,10 +142,15 @@ async function analyzeRequest(request: AgentRequest): Promise<SecurityResponse> 
         promptLength: request.prompt.length,
         suspiciousPatterns: detectedPatterns,
         confidence: detectedPatterns.length > 0 ? 0.8 : 0.6,
-        cached: false, // Mock for now
+        cached: false,
         policiesMatched: detectedPatterns.length > 0 ? 1 : 0
       }
     };
+    
+    // Cache the result for 1 hour
+    await cache.set(cacheKey, result, 3600);
+    
+    return result;
     
   } catch (error) {
     return {
@@ -194,21 +221,35 @@ router.post('/analyze', async (req, res) => {
 });
 
 // Security status endpoint
-router.get('/status', (req, res) => {
-  res.json({
-    success: true,
-    data: {
-      service: 'SeiAgentGuard Security API',
-      version: '2.0.0',
-      status: 'operational',
-      features: {
-        threatDetection: true,
-        policyEngine: true,
-        redisCaching: true,
-        rateLimiting: true
+router.get('/status', async (req, res) => {
+  try {
+    const cacheHealth = await cache.isHealthy();
+    
+    res.json({
+      success: true,
+      data: {
+        service: 'SeiAgentGuard Security API',
+        version: '2.0.0',
+        status: 'operational',
+        features: {
+          threatDetection: true,
+          policyEngine: true,
+          redisCaching: cacheHealth,
+          rateLimiting: true
+        },
+        cache: {
+          status: cacheHealth ? 'connected' : 'disconnected',
+          redisUrl: process.env.REDIS_URL || 'redis://localhost:6379'
+        }
       }
-    }
-  });
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      error: 'Failed to get status',
+      code: 'STATUS_ERROR'
+    });
+  }
 });
 
 export { router as securityRoutes }; 
