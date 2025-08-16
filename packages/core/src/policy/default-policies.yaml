@@ -1,0 +1,72 @@
+policies:
+  - name: "prompt_injection_detection"
+    description: "Detect and block prompt injection attacks"
+    enabled: true
+    severity: "critical"
+    priority: 1
+    conditions:
+      - type: "pattern_match"
+        operator: "contains"
+        value: ["ignore previous", "system prompt", "reveal instructions", "forget everything above"]
+      - type: "risk_score"
+        operator: "greater_than"
+        value: 0.7
+    actions:
+      - type: "block"
+        message: "Potential prompt injection detected"
+        
+  - name: "high_frequency_requests"
+    description: "Rate limiting for suspicious activity"
+    enabled: true
+    severity: "medium"
+    priority: 2
+    conditions:
+      - type: "request_frequency"
+        operator: "greater_than"
+        value: 100
+    actions:
+      - type: "warn"
+        message: "High request frequency detected"
+        
+  - name: "moderate_risk_warning"
+    description: "Warn on moderate risk content"
+    enabled: true
+    severity: "medium"
+    priority: 3
+    conditions:
+      - type: "risk_score"
+        operator: "greater_than"
+        value: 0.3
+      - type: "risk_score"
+        operator: "less_than"
+        value: 0.7
+    actions:
+      - type: "warn"
+        message: "Moderate risk content detected"
+        
+  - name: "safe_content_allow"
+    description: "Allow safe content with logging"
+    enabled: true
+    severity: "low"
+    priority: 4
+    conditions:
+      - type: "risk_score"
+        operator: "less_than"
+        value: 0.3
+    actions:
+      - type: "allow"
+        message: "Content appears safe"
+        
+  - name: "admin_override_detection"
+    description: "Detect admin/system override attempts"
+    enabled: true
+    severity: "high"
+    priority: 1
+    conditions:
+      - type: "pattern_match"
+        operator: "contains"
+        value: ["[ADMIN]", "[SYSTEM]", "admin override", "system override"]
+    actions:
+      - type: "block"
+        message: "Admin override attempt detected"
+
