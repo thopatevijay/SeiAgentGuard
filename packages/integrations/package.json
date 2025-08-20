@@ -1,0 +1,24 @@
+{
+  "name": "@seiagentguard/integrations",
+  "version": "1.0.0",
+  "description": "Sponsor tools integration for SeiAgentGuard",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsx watch src/index.ts",
+    "test": "vitest"
+  },
+  "dependencies": {
+    "axios": "^1.11.0",
+    "aws-sdk": "^2.1691.0",
+    "@aws-sdk/client-sagemaker-runtime": "^3.692.0",
+    "socket.io-client": "^4.8.1"
+  },
+  "devDependencies": {
+    "@types/node": "^24.1.0",
+    "typescript": "^5.8.3",
+    "tsx": "^4.20.3",
+    "vitest": "^3.2.4"
+  }
+}
