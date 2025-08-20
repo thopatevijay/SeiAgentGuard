@@ -2,7 +2,17 @@
   "name": "@seiagentguard/contracts",
   "version": "1.0.0",
   "scripts": {
-    "test": "echo \"No tests specified for contracts package in Phase 1\" && exit 0",
-    "compile": "echo \"Contract compilation will be added in Phase 3\" && exit 0"
+    "compile": "hardhat compile",
+    "test": "hardhat test",
+    "deploy:testnet": "hardhat deploy --network sei-testnet",
+    "verify": "hardhat verify --network sei-testnet"
+  },
+  "dependencies": {
+    "@openzeppelin/contracts": "^5.2.0"
+  },
+  "devDependencies": {
+    "hardhat": "^2.22.17",
+    "@nomicfoundation/hardhat-toolbox": "^5.0.0",
+    "hardhat-deploy": "^0.12.4"
   }
 }
