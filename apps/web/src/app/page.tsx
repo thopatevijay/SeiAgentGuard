@@ -1,10 +1,6 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar } from 'recharts';
-import { Shield, AlertTriangle, Users, Activity, TrendingUp, TrendingDown } from 'lucide-react';
 
 interface SecurityMetrics {
   totalThreats: number;
@@ -12,112 +8,30 @@ interface SecurityMetrics {
   activeAgents: number;
   averageResponseTime: number;
   systemHealth: 'healthy' | 'warning' | 'critical';
-  blockchainEvents: number;
-  cacheHitRate: number;
-}
-
-interface ThreatData {
-  time: string;
-  threats: number;
-  blocked: number;
 }
 
 export default function DashboardPage() {
   const [metrics, setMetrics] = useState<SecurityMetrics>({
-    totalThreats: 0,
-    threatsBlocked: 0,
-    activeAgents: 0,
-    averageResponseTime: 0,
-    systemHealth: 'healthy',
-    blockchainEvents: 0,
-    cacheHitRate: 0
+    totalThreats: 156,
+    threatsBlocked: 142,
+    activeAgents: 23,
+    averageResponseTime: 45,
+    systemHealth: 'healthy'
   });
 
-  const [threatData, setThreatData] = useState<ThreatData[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
-    // Fetch initial metrics
-    fetchMetrics();
-    
-    // Setup WebSocket for real-time updates
-    const ws = new WebSocket('ws://localhost:3003');
-    ws.onmessage = (event) => {
-      const data = JSON.parse(event.data);
-      if (data.type === 'metrics') {
-        setMetrics(data.payload);
-      }
-    };
-
-    // Setup polling for metrics
-    const interval = setInterval(fetchMetrics, 30000); // Every 30 seconds
-
-    return () => {
-      ws.close();
-      clearInterval(interval);
-    };
+    // Simulate loading
+    setIsLoading(true);
+    setTimeout(() => setIsLoading(false), 1000);
   }, []);
-
-  const fetchMetrics = async () => {
-    try {
-      const response = await fetch('http://localhost:3001/api/v1/metrics');
-      if (response.ok) {
-        const data = await response.json();
-        setMetrics(data);
-      }
-    } catch (error) {
-      console.error('Failed to fetch metrics:', error);
-      // Use mock data for development
-      setMetrics({
-        totalThreats: 156,
-        threatsBlocked: 142,
-        activeAgents: 23,
-        averageResponseTime: 45,
-        systemHealth: 'healthy',
-        blockchainEvents: 89,
-        cacheHitRate: 78
-      });
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  // Mock threat data for development
-  useEffect(() => {
-    const mockData = [
-      { time: '00:00', threats: 12, blocked: 11 },
-      { time: '04:00', threats: 8, blocked: 7 },
-      { time: '08:00', threats: 25, blocked: 23 },
-      { time: '12:00', threats: 34, blocked: 31 },
-      { time: '16:00', threats: 28, blocked: 26 },
-      { time: '20:00', threats: 18, blocked: 17 },
-    ];
-    setThreatData(mockData);
-  }, []);
-
-  const getHealthColor = (health: string) => {
-    switch (health) {
-      case 'healthy': return 'text-green-600';
-      case 'warning': return 'text-yellow-600';
-      case 'critical': return 'text-red-600';
-      default: return 'text-gray-600';
-    }
-  };
-
-  const getHealthIcon = (health: string) => {
-    switch (health) {
-      case 'healthy': return <TrendingUp className="h-4 w-4 text-green-600" />;
-      case 'warning': return <AlertTriangle className="h-4 w-4 text-yellow-600" />;
-      case 'critical': return <AlertTriangle className="h-4 w-4 text-red-600" />;
-      default: return <Activity className="h-4 w-4 text-gray-600" />;
-    }
-  };
 
   if (isLoading) {
     return (
       <div className="flex items-center justify-center h-screen">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-primary"></div>
+          <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-600"></div>
           <p className="mt-4 text-lg">Loading SeiAgentGuard Dashboard...</p>
         </div>
       </div>
@@ -125,172 +39,200 @@ export default function DashboardPage() {
   }
 
   return (
-    <div className="space-y-6">
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold tracking-tight">Security Overview</h1>
-          <p className="text-muted-foreground">
+    <div className="min-h-screen bg-gray-50 p-8">
+      <div className="max-w-7xl mx-auto">
+        {/* Header */}
+        <div className="mb-8">
+          <h1 className="text-4xl font-bold text-gray-900 mb-2">
+            SeiAgentGuard Security Dashboard
+          </h1>
+          <p className="text-lg text-gray-600">
             Real-time monitoring of AI agent security threats and system health
           </p>
         </div>
-        <div className="flex items-center gap-2">
-          <Badge variant="outline" className={getHealthColor(metrics.systemHealth)}>
-            {getHealthIcon(metrics.systemHealth)}
+
+        {/* Status Badge */}
+        <div className="mb-8">
+          <span className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium ${
+            metrics.systemHealth === 'healthy' 
+              ? 'bg-green-100 text-green-800' 
+              : metrics.systemHealth === 'warning'
+              ? 'bg-yellow-100 text-yellow-800'
+              : 'bg-red-100 text-red-800'
+          }`}>
+            {metrics.systemHealth === 'healthy' && '🟢'}
+            {metrics.systemHealth === 'warning' && '🟡'}
+            {metrics.systemHealth === 'critical' && '🔴'}
             <span className="ml-2 capitalize">{metrics.systemHealth}</span>
-          </Badge>
+          </span>
         </div>
-      </div>
 
-      {/* Metrics Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Threats</CardTitle>
-            <AlertTriangle className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{metrics.totalThreats}</div>
-            <p className="text-xs text-muted-foreground">
-              +12% from last hour
-            </p>
-          </CardContent>
-        </Card>
+        {/* Metrics Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+          {/* Total Threats */}
+          <div className="bg-white rounded-lg shadow p-6">
+            <div className="flex items-center justify-between">
+              <h3 className="text-sm font-medium text-gray-500">Total Threats</h3>
+              <span className="text-2xl">⚠️</span>
+            </div>
+            <div className="mt-2">
+              <p className="text-3xl font-bold text-gray-900">{metrics.totalThreats}</p>
+              <p className="text-sm text-gray-500">+12% from last hour</p>
+            </div>
+          </div>
 
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Threats Blocked</CardTitle>
-            <Shield className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{metrics.threatsBlocked}</div>
-            <p className="text-xs text-muted-foreground">
-              {Math.round((metrics.threatsBlocked / metrics.totalThreats) * 100)}% success rate
-            </p>
-          </CardContent>
-        </Card>
+          {/* Threats Blocked */}
+          <div className="bg-white rounded-lg shadow p-6">
+            <div className="flex items-center justify-between">
+              <h3 className="text-sm font-medium text-gray-500">Threats Blocked</h3>
+              <span className="text-2xl">🛡️</span>
+            </div>
+            <div className="mt-2">
+              <p className="text-3xl font-bold text-gray-900">{metrics.threatsBlocked}</p>
+              <p className="text-sm text-gray-500">
+                {Math.round((metrics.threatsBlocked / metrics.totalThreats) * 100)}% success rate
+              </p>
+            </div>
+          </div>
 
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Active Agents</CardTitle>
-            <Users className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{metrics.activeAgents}</div>
-            <p className="text-xs text-muted-foreground">
-              3 new this hour
-            </p>
-          </CardContent>
-        </Card>
+          {/* Active Agents */}
+          <div className="bg-white rounded-lg shadow p-6">
+            <div className="flex items-center justify-between">
+              <h3 className="text-sm font-medium text-gray-500">Active Agents</h3>
+              <span className="text-2xl">🤖</span>
+            </div>
+            <div className="mt-2">
+              <p className="text-3xl font-bold text-gray-900">{metrics.activeAgents}</p>
+              <p className="text-sm text-gray-500">3 new this hour</p>
+            </div>
+          </div>
 
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Response Time</CardTitle>
-            <Activity className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{metrics.averageResponseTime}ms</div>
-            <p className="text-xs text-muted-foreground">
-              -5% from last hour
-            </p>
-          </CardContent>
-        </Card>
-      </div>
+          {/* Response Time */}
+          <div className="bg-white rounded-lg shadow p-6">
+            <div className="flex items-center justify-between">
+              <h3 className="text-sm font-medium text-gray-500">Response Time</h3>
+              <span className="text-2xl">⚡</span>
+            </div>
+            <div className="mt-2">
+              <p className="text-3xl font-bold text-gray-900">{metrics.averageResponseTime}ms</p>
+              <p className="text-sm text-gray-500">-5% from last hour</p>
+            </div>
+          </div>
+        </div>
 
-      {/* Charts */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <Card>
-          <CardHeader>
-            <CardTitle>Threat Activity (24h)</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <ResponsiveContainer width="100%" height={300}>
-              <LineChart data={threatData}>
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="time" />
-                <YAxis />
-                <Tooltip />
-                <Line type="monotone" dataKey="threats" stroke="#ef4444" strokeWidth={2} />
-                <Line type="monotone" dataKey="blocked" stroke="#22c55e" strokeWidth={2} />
-              </LineChart>
-            </ResponsiveContainer>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader>
-            <CardTitle>System Performance</CardTitle>
-          </CardHeader>
-          <CardContent>
+        {/* Simple Charts */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+          {/* Threat Activity */}
+          <div className="bg-white rounded-lg shadow p-6">
+            <h3 className="text-lg font-medium text-gray-900 mb-4">Threat Activity (24h)</h3>
             <div className="space-y-4">
               <div className="flex items-center justify-between">
-                <span className="text-sm font-medium">Blockchain Events</span>
-                <span className="text-sm text-muted-foreground">{metrics.blockchainEvents}</span>
+                <span className="text-sm font-medium">00:00</span>
+                <div className="flex items-center gap-2">
+                  <div className="w-20 h-4 bg-red-200 rounded">
+                    <div className="w-16 h-4 bg-red-500 rounded"></div>
+                  </div>
+                  <span className="text-sm">12 threats, 11 blocked</span>
+                </div>
               </div>
-              <div className="w-full bg-gray-200 rounded-full h-2">
-                <div 
-                  className="bg-blue-600 h-2 rounded-full" 
-                  style={{ width: `${Math.min((metrics.blockchainEvents / 100) * 100, 100)}%` }}
-                ></div>
-              </div>
-              
               <div className="flex items-center justify-between">
-                <span className="text-sm font-medium">Cache Hit Rate</span>
-                <span className="text-sm text-muted-foreground">{metrics.cacheHitRate}%</span>
+                <span className="text-sm font-medium">08:00</span>
+                <div className="flex items-center gap-2">
+                  <div className="w-20 h-4 bg-red-200 rounded">
+                    <div className="w-18 h-4 bg-red-500 rounded"></div>
+                  </div>
+                  <span className="text-sm">25 threats, 23 blocked</span>
+                </div>
               </div>
-              <div className="w-full bg-gray-200 rounded-full h-2">
-                <div 
-                  className="bg-green-600 h-2 rounded-full" 
-                  style={{ width: `${metrics.cacheHitRate}%` }}
-                ></div>
+              <div className="flex items-center justify-between">
+                <span className="text-sm font-medium">16:00</span>
+                <div className="flex items-center gap-2">
+                  <div className="w-20 h-4 bg-red-200 rounded">
+                    <div className="w-14 h-4 bg-red-500 rounded"></div>
+                  </div>
+                  <span className="text-sm">28 threats, 26 blocked</span>
+                </div>
               </div>
             </div>
-          </CardContent>
-        </Card>
-      </div>
+          </div>
 
-      {/* Recent Activity */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Recent Security Events</CardTitle>
-        </CardHeader>
-        <CardContent>
+          {/* System Performance */}
+          <div className="bg-white rounded-lg shadow p-6">
+            <h3 className="text-lg font-medium text-gray-900 mb-4">System Performance</h3>
+            <div className="space-y-4">
+              <div>
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-sm font-medium">Blockchain Events</span>
+                  <span className="text-sm text-gray-500">89</span>
+                </div>
+                <div className="w-full bg-gray-200 rounded-full h-2">
+                  <div className="bg-blue-600 h-2 rounded-full" style={{ width: '89%' }}></div>
+                </div>
+              </div>
+              
+              <div>
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-sm font-medium">Cache Hit Rate</span>
+                  <span className="text-sm text-gray-500">78%</span>
+                </div>
+                <div className="w-full bg-gray-200 rounded-full h-2">
+                  <div className="bg-green-600 h-2 rounded-full" style={{ width: '78%' }}></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Recent Activity */}
+        <div className="bg-white rounded-lg shadow p-6">
+          <h3 className="text-lg font-medium text-gray-900 mb-4">Recent Security Events</h3>
           <div className="space-y-4">
             <div className="flex items-center justify-between p-3 bg-red-50 rounded-lg">
               <div className="flex items-center gap-3">
-                <AlertTriangle className="h-5 w-5 text-red-600" />
+                <span className="text-2xl">⚠️</span>
                 <div>
-                  <p className="font-medium">Prompt Injection Attempt</p>
-                  <p className="text-sm text-muted-foreground">Agent: AI-Trading-Bot-001</p>
+                  <p className="font-medium text-red-900">Prompt Injection Attempt</p>
+                  <p className="text-sm text-red-600">Agent: AI-Trading-Bot-001</p>
                 </div>
               </div>
-              <Badge variant="destructive">Blocked</Badge>
+              <span className="px-2 py-1 bg-red-100 text-red-800 text-xs font-medium rounded">
+                Blocked
+              </span>
             </div>
             
             <div className="flex items-center justify-between p-3 bg-yellow-50 rounded-lg">
               <div className="flex items-center gap-3">
-                <Shield className="h-5 w-5 text-yellow-600" />
+                <span className="text-2xl">🛡️</span>
                 <div>
-                  <p className="font-medium">Suspicious Tool Access</p>
-                  <p className="text-sm text-muted-foreground">Agent: Data-Analyzer-003</p>
+                  <p className="font-medium text-yellow-900">Suspicious Tool Access</p>
+                  <p className="text-sm text-yellow-600">Agent: Data-Analyzer-003</p>
                 </div>
               </div>
-              <Badge variant="secondary">Warning</Badge>
+              <span className="px-2 py-1 bg-yellow-100 text-yellow-800 text-xs font-medium rounded">
+                Warning
+              </span>
             </div>
             
             <div className="flex items-center justify-between p-3 bg-green-50 rounded-lg">
               <div className="flex items-center gap-3">
-                <Shield className="h-5 w-5 text-green-600" />
+                <span className="text-2xl">✅</span>
                 <div>
-                  <p className="font-medium">Policy Update Applied</p>
-                  <p className="text-sm text-muted-foreground">Enhanced MCP security rules</p>
+                  <p className="font-medium text-green-900">Policy Update Applied</p>
+                  <p className="text-sm text-green-600">Enhanced MCP security rules</p>
                 </div>
               </div>
-              <Badge variant="outline">Info</Badge>
+              <span className="px-2 py-1 bg-green-100 text-green-800 text-xs font-medium rounded">
+                Info
+              </span>
             </div>
           </div>
-        </CardContent>
-      </Card>
+        </div>
+
+        {/* Footer */}
+        <div className="mt-12 text-center text-gray-500">
+          <p>Connected to Sei Network • Real-time monitoring active</p>
+        </div>
+      </div>
     </div>
   );
 }

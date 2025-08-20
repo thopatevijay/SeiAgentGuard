@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
-import DashboardSidebar from "@/components/DashboardSidebar";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -28,21 +27,7 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <div className="flex h-screen bg-background">
-          <DashboardSidebar />
-          <div className="flex-1 overflow-auto">
-            <header className="border-b bg-card px-6 py-4">
-              <div className="flex items-center justify-between">
-                <div className="text-sm text-muted-foreground">
-                  Connected to Sei Network
-                </div>
-              </div>
-            </header>
-            <main className="p-6">
-              {children}
-            </main>
-          </div>
-        </div>
+        {children}
       </body>
     </html>
   );
