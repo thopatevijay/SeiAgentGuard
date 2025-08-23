@@ -179,6 +179,7 @@ export default function DashboardPage() {
                   <div className="bg-green-600 h-2 rounded-full" style={{ width: '78%' }}></div>
                 </div>
               </div>
+
             </div>
           </div>
         </div>
